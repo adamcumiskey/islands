@@ -87,10 +87,10 @@
                    visited
                    (mark-land grid x y))
             (recur next-x 
-                         next-y 
-                         (set (rest queue)) 
-                         visited
-                         grid)))))))
+                   next-y 
+                   (set (rest queue)) 
+                   visited
+                   grid)))))))
 
 ; return the total number of islands in the ocean
 (defn count-islands [grid]
