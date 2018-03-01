@@ -26,6 +26,12 @@
              [0 1 1 0 1]
              [0 1 0 0 1]])
 
+(def all-land [[1 1 1 1 1]
+               [1 1 1 1 1]
+               [1 1 1 1 1]
+               [1 1 1 1 1]
+               [1 1 1 1 1]])
+
 (deftest island-counts
   (testing "Empty ocean"
     (is (zero? (count-islands empty-ocean))))
@@ -34,4 +40,6 @@
   (testing "Diagonal islands"
     (is (= 2 (count-islands diagonal-islands))))
   (testing "Normal case"
-    (is (= 3 (count-islands normal)))))
+    (is (= 3 (count-islands normal))))
+  (testing "Only Land"
+    (is (= 1 (count-islands all-land)))))
