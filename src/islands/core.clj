@@ -56,10 +56,9 @@
 (defn mark-island [grid x y]
   (if-not (is-land? grid x y)
     grid
-    (let [grid_m (mark-land grid x y)
-          result (reduce (fn [s n] (mark-island s (first n) (second n)))
-                         grid_m
-                         (adjacent-nodes grid_m x y))]
+    (let [result (reduce (fn [s n] (mark-island s (first n) (second n)))
+                         (mark-land grid x y)
+                         (adjacent-nodes grid x y))]
       result)))
 
 (defn count-islands [grid]
