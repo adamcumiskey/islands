@@ -7,12 +7,14 @@
   #(if (= (mod (rand-int 30) 3) 0) 1 0))
 
 (defn gen-row [n gen-node-fn]
-  "Generate a row"
   (vec (take n (repeatedly gen-node-fn))))
 
-(defn gen-grid [n m gen-node-fn]
+(defn gen-grid
   "Generate a grid"
-  (vec (take n (repeatedly #(gen-row m gen-node-fn)))))
+  ([n] (gen-grid n n))
+  ([n m] (gen-grid n m gen-rand-node))
+  ([n m gen-node-fn]
+   (vec (take n (repeatedly #(gen-row m gen-node-fn))))))
 
 (defn get-node [grid x y]
   "Return the element at x y"
@@ -31,29 +33,6 @@
 
 (defn mark-land [grid x y]
   (mark grid x y -1))
-
-; print functions
-(defn node-str [node]
-  "Tiles used to represent nodes in the print functions
-  1 is land
-  0 is ocean
-  -1 is visited"
-  (cond
-    (= node 1) "❎"
-    (= node 0) "🚹"
-    (= node -1) "🚼"))
-
-(defn row-str [row]
-  "Return a row as a string"
-  (clojure.string/join (interpose " " (map (fn [node] (node-str node)) row))))
-
-(defn grid-str [grid]
-  "Return a grid as a string"
-  (clojure.string/join (interpose "\n" (map (fn [row] (row-str row)) grid))))
-
-(defn print-grid [grid]
-  "Pretty-print a grid"
-  (println (grid-str grid)))
 
 (defn adjacent-nodes [grid x y]
   "returns a set of all the indecies surrounding a given index"
@@ -75,36 +54,16 @@
                  (list i j)))))))
 
 (defn mark-island [grid x y]
-  "Return a grid with the landmass connected to (x y) as visited"
   (if-not (is-land? grid x y)
     grid
-    (loop [x x
-           y y
-           queue (adjacent-nodes grid x y)
-           visited #{}
-           grid grid]
-      (if (and (empty? queue) (or (nil? x) (nil? y))) ; Return when the queue is empty and x y is invalid
-        grid
-        (let [next-x (first (first queue))
-              next-y (second (first queue))
-              visited (clojure.set/union #{(list x y)} visited)] ; mark the current x y as visited
-          (if (is-land? grid x y)
-            (recur next-x
-                   next-y
-                   ; If a match is found, add all the adjacent nodes to the queue.
-                   (-> (set (rest queue))
-                       (clojure.set/union (adjacent-nodes grid x y))
-                       (clojure.set/difference visited))
-                   visited
-                   (mark-land grid x y))
-            (recur next-x
-                   next-y
-                   (set (rest queue))
-                   visited
-                   grid)))))))
+    (let [grid_m (mark-land grid x y)
+          result (reduce (fn [s n] (mark-island s (first n) (second n)))
+                         grid_m
+                         (adjacent-nodes grid_m x y))]
+      result)))
 
 (defn count-islands [grid]
-  "Return the total number of islands in the ocean"
+  "Return the total number of islands in the grid"
   (let [max-x (count (grid 0))
         max-y (count grid)]
     (loop [grid grid
