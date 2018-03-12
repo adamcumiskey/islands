@@ -35,11 +35,14 @@
                  (list i j)))))))
 
 (defn mark-island [grid x y]
+  "Uses DFS to mark all land connected to the starting node as visited"
   (if-not (is-land? grid x y)
     grid
-    (let [result (reduce (fn [s n] (mark-island s (first n) (second n)))
-                         (set-node grid x y -1)
-                         (adjacent-nodes grid x y))]
+    (let [marked-grid (set-node grid x y -1)
+          to-visit (adjacent-nodes grid x y)
+          result (reduce (fn [s n] (mark-island s (first n) (second n)))
+                         marked-grid
+                         to-visit)]
       result)))
 
 (defn count-islands [grid]
@@ -50,10 +53,10 @@
            x 0
            y 0
            n 0]
-      (cond (>= y max-y) n
-            (>= x max-x) (recur grid 0 (inc y) n)
-            (is-land? grid x y) (recur (mark-island grid x y) (inc x) y (inc n))
-            :else (recur grid (inc x) y n)))))
+      (cond (>= y max-y) n ; end of grid 
+            (>= x max-x) (recur grid 0 (inc y) n) ; end of row
+            (is-land? grid x y) (recur (mark-island grid x y) (inc x) y (inc n)) ; island found
+            :else (recur grid (inc x) y n))))) ; next 
 
 ;; Repl helpers
 
